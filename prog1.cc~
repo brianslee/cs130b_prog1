@@ -1,0 +1,116 @@
+/*
+ * Brian Lee
+ * CMPSC 130B Programming Assignment 1
+ * Brute-Force and Divide-and-Conquer
+ * Distance between two points
+ */
+#include <iostream>
+#include <cmath>
+#include <climits>
+#include <float.h>
+#include <vector>
+#include "prog1.h"
+
+using namespace std;
+
+double getDistance(Point a, Point b)
+{
+  double x = (b.xCoor - a.xCoor);
+  double y = (b.yCoor - a.yCoor);
+  x = x * x;
+  y = y * y;
+  double d = x + y;
+  d = sqrt(d);
+  return d;
+}
+
+progOut bruteClosest(int size, vector<Point> list, int count)
+{
+  double minDist = DBL_MAX;
+  Point first;
+  Point sec;
+  for(int i = 0; i < size; ++i)
+  {
+    for(int j = i + 1; j < size; ++j)
+    {
+      int dist = getDistance(list.at(i), list.at(j));
+      if(dist < minDist)
+      {
+        minDist = dist;
+        first = list.at(i);
+        sec = list.at(j);
+      }
+      count++;
+    }
+  }
+  
+  progOut out(first, sec, count, minDist);
+  return out;
+}
+
+progOut dncClosest(vector<Point> list, int counter)
+{
+  if(list.size() <= 3)
+  {
+    return bruteClosest(list.size(), list, counter);
+  }
+  
+  //Find middle Point
+  int middle = list.size() / 2;
+  Point midPoint = list.at(middle);
+  
+  //Split vector into left and right
+  vector<Point> lSplit;
+  vector<Point> rSplit;
+  for(int i = 0; i < middle; ++i)
+  {
+    lSplit.push_back(list.at(i));
+  }
+  for(int i = middle; i < list.size(); ++i)
+  {
+    rSplit.push_back(list.at(i));
+  }
+  
+  progOut left = dncClosest(lSplit, counter);
+  progOut right = dncClosest(rSplit, counter);
+  //Find minimum distance from split vectors
+  progOut output;
+  if(left.distance <= right.distance)
+  {
+    output = left;
+  }
+  else
+  {
+    output = right;
+  }
+  counter++;
+  //check center of vector
+  vector<Point> center;
+  for(int i = 0; i < list.size(); ++i)
+  {
+    if(abs(list.at(i).xCoor - midPoint.xCoor) < output.distance)
+    {
+      center.push_back(list.at(i));
+    }
+  }
+  
+  progOut centOut = bruteClosest(center.size(), center, counter);
+  counter++;
+  if(output.distance <= centOut.distance)
+  {
+    output.count += counter;
+    return output;
+  }
+  else
+  {
+    centOut.count += counter;
+    return centOut;
+  }
+}
+
+void print(progOut out)
+{
+  cout << out.p1.xCoor << " " << out.p1.yCoor << " " << out.p2.xCoor << " ";
+  cout << out.p2.yCoor << endl;
+  cout << out.count << endl;
+}

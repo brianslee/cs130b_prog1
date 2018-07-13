@@ -1,0 +1,93 @@
+/*
+ * Brian  Lee
+ * 3620101
+ * CMPSC 130B Programming Assignment 1
+ * Brute Force and Divide-and-Conquer
+ * Distance between two points
+ */
+
+#include <iostream>
+#include <time.h>
+#include <vector>
+#include <stdlib.h>
+
+#include "prog1.h"
+
+using namespace std;
+
+int compare(const void* a, const void* b)
+{
+    Point *p1 = (Point *)a;
+    Point *p2 = (Point *)b;
+    return (p1->xCoor - p2->xCoor);
+}
+
+int main()
+{
+    //Get N
+    int N;
+    clock_t startTime, endTime;
+    float bruteTime, dncTime;
+    cout << "Array Size: ";
+    cin >> N;
+    cout << endl;
+    
+    //Create array and fill it
+    Point arr[N];
+    for(int i = 0; i < N; ++i)
+    {
+        cout << "Input X and Y: ";
+        //Get input into string stream
+        double x, y;
+        cin >> x >> y;
+        Point p(x, y);
+        arr[i] = p;
+        cout << "(" << p.xCoor << ", " << p.yCoor << ")" << endl;
+    }
+    
+    //Sort array
+    qsort(arr, N, sizeof(Point), compare);
+    vector<Point> list;
+    
+    for(int i = 0; i < N; ++i)
+    {
+        list.push_back(arr[i]);
+    }
+    // Show sorted array
+    /*
+    cout << "X Sorted Array" << endl;
+    for(int i = 0; i < N; ++i)
+    {
+        cout << "(" << list.at(i).xCoor << ", ";
+        cout << list.at(i).yCoor << ")" << endl;
+    }
+    */
+    
+    //Brute Force algorithm
+    
+    int bruteCount = 0;
+    startTime = clock();
+    progOut brute = bruteClosest(N, list, bruteCount);
+    endTime = clock();
+    bruteTime = (float)(endTime - startTime)/CLOCKS_PER_SEC;
+    
+    //Output Brute Force results
+    
+    print(brute);
+    
+    //Divide-and-Conquer algorithm
+    
+    int dncCount = 0;
+    startTime = clock();
+    progOut dNC = dncClosest(list, dncCount);
+    endTime = clock();
+    dncTime = (float)(endTime - startTime)/CLOCKS_PER_SEC;
+    
+    //Output Divide-and-Conquer results
+    print(dNC);
+    
+    cout << "Brute Force Time: " << bruteTime << endl;
+    cout << "Divide and Conquer Time: " << dncTime << endl;
+    
+    return 0;
+}
